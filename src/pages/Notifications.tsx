@@ -12,12 +12,19 @@ const Notifications = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [seenNotificationTypes, setSeenNotificationTypes] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
 
   const fetchNotifications = async () => {
-    const { newNotifications, updatedSeenTypes } = await getNotifications(seenNotificationTypes);
-    if (newNotifications.length > 0) {
-      setNotifications((prev) => [...newNotifications, ...prev]); // Prepend new notifications
-      setSeenNotificationTypes(updatedSeenTypes);
+    try {
+      const { newNotifications, updatedSeenTypes } = await getNotifications(seenNotificationTypes);
+      if (newNotifications.length > 0) {
+        setNotifications((prev) => [...newNotifications, ...prev]); // Prepend new notifications
+        setSeenNotificationTypes(updatedSeenTypes);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    } finally {
+      setLoading(false); // Ensure loading state is set to false after the fetch
     }
   };
 
@@ -57,7 +64,9 @@ const Notifications = () => {
         </div>
 
         <ScrollArea className="h-[600px] rounded-md border p-4">
-          {notifications.length === 0 ? (
+          {loading ? ( // Show loading message while loading
+            <p className="text-center text-gray-500">Loading notifications...</p>
+          ) : notifications.length === 0 ? (
             <p className="text-center text-gray-500">No notifications yet</p>
           ) : (
             notifications.map((notification) => (
