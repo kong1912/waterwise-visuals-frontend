@@ -55,15 +55,29 @@ const Index = () => {
     const getData = async () => {
       const data = await getRecentPlantData();
       if (data) {
-        const status = determineStatus(data.moisture, data.temperature, data.humidity);
-        setPlantData({ ...data, status });
+        // Extract values from the data
+        const brightness = data.brightness?.value?.ldr_value ?? 0;
+        const soilMoisture = 100 - data.soil?.value?.soil_moisture || 0;
+        const temperature = data.temperature?.value?.temperature ?? 0;
+        const humidity = data.temperature?.value?.humidity ?? 0;
+
+        // Set status based on soil moisture
+        const status = determineStatus(soilMoisture, temperature, humidity);
+
+        setPlantData({
+          brightness,
+          moisture: soilMoisture,
+          temperature,
+          humidity,
+          status,
+        });
       }
     };
 
-    getData(); // Fetch immediately on mount
+    getData(); // Fetch data immediately on mount
 
     const interval = setInterval(() => {
-      getData(); // Fetch every 10 seconds
+      getData(); // Fetch data every 10 seconds
     }, 10000);
 
     return () => clearInterval(interval); // Cleanup interval on component unmount
