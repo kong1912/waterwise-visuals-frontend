@@ -3,17 +3,14 @@ import { PlantCard } from "@/components/PlantCard";
 import WateringControl from "@/components/WateringControl";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { BarChart3, Bell } from "lucide-react";
-import { getRecentPlantData } from "@/services/PlantService";
-
-
-
+import { BarChart3, Bell, Cpu } from "lucide-react";
+import { getRecentPlantData, identifyPlant } from "@/services/PlantService";
 
 
 const determineStatus = (moisture: number, temperature: number, humidity: number) => {
-  if (moisture > 40 && humidity >= 30) {
+  if (moisture > 50) {
     return "Healthy";
-  } else if (moisture <= 40 || humidity < 60) {
+  } else if (moisture <= 50 && moisture >= 10) {
     return "Needs Water";
   } else {
     return "Critical";
@@ -35,6 +32,24 @@ const Index = () => {
     brightness: 0,
     status: "Critical",
   });
+
+  const [plantInfo, setPlantInfo] = useState<{
+    name: string;
+    isPlant: number;
+    isHealthy: number;
+    disease: string;
+  } | null>(null);
+
+  const [loading, setLoading] = useState(false);
+
+  const handleIdentifyPlant = async () => {
+    setLoading(true);
+    const data = await identifyPlant();
+    if (data) {
+      setPlantInfo(data);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
     const getData = async () => {
@@ -75,22 +90,60 @@ const Index = () => {
           <WateringControl />
         </div>
 
-        <div className="flex justify-center gap-4 mt-8">
-          <Button
-            onClick={() => navigate('/graphs')}
-            className="flex items-center gap-2"
-          >
-            <BarChart3 className="w-4 h-4" />
-            View Detailed Graphs
-          </Button>
-          <Button
-            onClick={() => navigate('/notifications')}
-            className="flex items-center gap-2"
-            variant="outline"
-          >
-            <Bell className="w-4 h-4" />
-            View Notifications
-          </Button>
+        <div className="flex flex-col items-center gap-4 mt-8">
+          <div className="flex gap-4">
+            <Button
+              onClick={() => navigate('/graphs')}
+              className="flex items-center gap-2"
+            >
+              <BarChart3 className="w-4 h-4" />
+              View Detailed Graphs
+            </Button>
+            <Button
+              onClick={handleIdentifyPlant}
+              className="flex items-center gap-2"
+              variant="outline"
+              disabled={loading}
+            >
+              <Cpu className="w-4 h-4" />
+              {loading ? "Processing..." : "Process Image"}
+            </Button>
+          </div>
+
+          {plantInfo && plantInfo.isPlant > 0.5 && (
+            <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-xl">
+              <h2 className="text-2xl font-semibold mb-4 text-plant-dark">Plant Identification</h2>
+              <p className="text-lg mb-2">
+                <strong>Name:</strong> {plantInfo.name}
+              </p>
+              <p className={`text-lg font-medium mb-2 ${plantInfo.isHealthy > 0.5 ? 'text-green-600' : 'text-red-600'}`}>
+                <strong>Health Status:</strong> {plantInfo.isHealthy > 0.5 ? "🌱 Plant is healthy" : "⚠️ Plant is not healthy"}
+              </p>
+              {plantInfo.isHealthy <= 0.5 && (
+                <p className={'text-lg font-medium mb-2 text-purple-600'}>
+                  <strong>Disease:</strong> {"💀 " + plantInfo.disease}
+                </p>
+              )}
+              <p className="text-sm text-gray-600 mt-4">
+                * Probabilities are calculated based on the provided image.
+              </p>
+            </div>
+          )}
+
+          {plantInfo && plantInfo.isPlant <= 0.5 && (
+            <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-xl">
+              <h2 className="text-2xl font-semibold mb-4 text-plant-dark">Plant Identification</h2>
+              <p className={`text-lg font-medium mb-2 ${plantInfo.isPlant > 0.5 ? 'text-green-600' : 'text-red-600'}`}>
+                <strong>Plant:</strong> {plantInfo.isPlant > 0.5 ? "✔️ Yes" : "❌ No"}
+              </p>
+              <p className="text-sm text-gray-600 mt-4">
+                * Probabilities are calculated based on the provided image.
+              </p>
+            </div>
+          )}
+
+
+
         </div>
       </div>
     </div>
