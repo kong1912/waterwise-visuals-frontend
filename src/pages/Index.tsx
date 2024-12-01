@@ -69,7 +69,7 @@ const Index = () => {
             moisture={plantData.moisture}
             temperature={plantData.temperature}
             humidity={plantData.humidity}
-            brightness={plantData.brightness}
+            brightness={Math.round((plantData.brightness / 4096 * 100) * 100) / 100}
             lastWatered="Today at 8:00 AM"
           />
           <WateringControl />

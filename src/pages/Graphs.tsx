@@ -23,12 +23,19 @@ const Graphs = () => {
     getData();
   }, []);
 
-  const formatData = (data: Record<string, any>) => {
+  const formatData = (data: Record<string, any>, transformFn = (value) => value) => {
     return Object.keys(data).map((key) => ({
-      time: key,
-      value: data[key],
+      time: new Date(parseInt(key, 10) * 1000).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false, // Use 24-hour format
+      }),
+      value: transformFn(data[key]),
     }));
   };
+  
+  
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -53,42 +60,30 @@ const Graphs = () => {
         <div className="grid gap-6">
           {/* Graph for Moisture */}
           <EnvironmentChart
-            data={formatData(soilData).map((d) => ({
-              time: d.time,
-              value: d.value.soil_moisture, // Adjust according to the structure of soilData
-            }))}
+            data={formatData(soilData, (value) => value.soil_moisture)} // Adjust if necessary
             title="Moisture Trends"
             yAxisLabel="Moisture (%)"
           />
 
           {/* Graph for Temperature */}
           <EnvironmentChart
-            data={formatData(tempData).map((d) => ({
-              time: d.time,
-              value: d.value.temperature, // Adjust according to the structure of tempData
-            }))}
+            data={formatData(tempData, (value) => value.temperature)} // Adjust if necessary
             title="Temperature Trends"
             yAxisLabel="Temperature (°C)"
           />
 
           {/* Graph for Humidity */}
           <EnvironmentChart
-            data={formatData(tempData).map((d) => ({
-              time: d.time,
-              value: d.value.humidity, // Adjust according to the structure of tempData
-            }))}
+            data={formatData(tempData, (value) => value.humidity)} // Adjust if necessary
             title="Humidity Trends"
             yAxisLabel="Humidity (%)"
           />
 
           {/* Graph for Brightness */}
           <EnvironmentChart
-            data={formatData(ldrData).map((d) => ({
-              time: d.time,
-              value: d.value.ldr_value, // Adjust according to the structure of ldrData
-            }))}
+            data={formatData(ldrData, (value) => (Math.round((value.ldr_value / 4096 * 100) * 100) / 100))}
             title="Brightness Trends"
-            yAxisLabel="Brightness (LDR)"
+            yAxisLabel="Brightness (%)"
           />
         </div>
       </div>
