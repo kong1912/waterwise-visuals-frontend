@@ -57,7 +57,7 @@ const Index = () => {
       if (data) {
         // Extract values from the data
         const brightness = data.brightness?.value?.ldr_value ?? 0;
-        const soilMoisture = data.soil?.value?.soil_moisture || 0;
+        const soilMoisture =100 - data.soil?.value?.soil_moisture || 0;
         const temperature = data.temperature?.value?.temperature ?? 0;
         const humidity = data.temperature?.value?.humidity ?? 0;
 
