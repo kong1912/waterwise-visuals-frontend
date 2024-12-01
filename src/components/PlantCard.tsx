@@ -9,7 +9,6 @@ interface PlantCardProps {
   temperature: number;
   humidity: number;
   brightness: number;
-  lastWatered: string;
 }
 
 export const PlantCard = ({
@@ -19,7 +18,6 @@ export const PlantCard = ({
   temperature,
   humidity,
   brightness,
-  lastWatered,
 }: PlantCardProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -72,12 +70,6 @@ export const PlantCard = ({
           </p>
           <p className="text-lg font-medium">{brightness}%</p>
         </div>
-      </div>
-      
-      <div className="mt-4 pt-4 border-t">
-        <p className="text-sm text-gray-500">
-          Last watered: {lastWatered}
-        </p>
       </div>
     </Card>
   );

@@ -78,6 +78,7 @@ const Index = () => {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex flex-col h-full">
           <PlantCard
             name="Monstera Deliciosa"
             status={plantData.status}
@@ -85,10 +86,13 @@ const Index = () => {
             temperature={plantData.temperature}
             humidity={plantData.humidity}
             brightness={Math.round((plantData.brightness / 4096 * 100) * 100) / 100}
-            lastWatered="Today at 8:00 AM"
           />
+        </div>
+        <div className="flex flex-col h-full">
           <WateringControl />
         </div>
+      </div>
+        
 
         <div className="flex flex-col items-center gap-4 mt-8">
           <div className="flex gap-4">
