@@ -13,7 +13,7 @@ const WateringControl = () => {
 
     const interval = setInterval(() => {
       updateImage(); // Update every second
-    }, 500);
+    }, 5000);
 
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, []);
